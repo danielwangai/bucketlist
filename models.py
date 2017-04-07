@@ -44,3 +44,23 @@ class Bucketlist(db.Model):
     
     def __repr__(self):
         return '<Bucketlist %r>' % self.name
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime)
+    modified_at = db.Column(db.DateTime)
+    done = db.Column(db.Boolean, default=False)
+    bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlist.id'))
+    bucketlist = db.relationship('Bucketlist', backref=db.backref('bucketlists', lazy='dynamic'))
+
+    def __init__(self, name, bucketlist):
+        self.id = id(self)
+        self.name = name
+        self.done = False
+        self.created_at = datetime.utcnow()
+        self.modified_at = None
+        self.bucketlist = bucketlist
+    
+    def __repr__(self):
+        return '<Task %r>' % self.name
