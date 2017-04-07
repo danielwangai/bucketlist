@@ -28,7 +28,6 @@ class User(db.Model):
 class Bucketlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
-    done = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
     created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -37,7 +36,6 @@ class Bucketlist(db.Model):
     def __init__(self, name, user):
         self.id = id(self)
         self.name = name
-        self.done = False
         self.created_at = datetime.utcnow()
         self.modified_at = None
         self.user = user
