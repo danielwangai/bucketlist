@@ -3,9 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
+from config import configurations
+
 app = Flask(__name__)
-app.config.from_object('config')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config.from_object(configurations["development"])
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
