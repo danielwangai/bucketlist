@@ -12,6 +12,8 @@ class Config(object):
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
+    SECRET_KEY = os.urandom(24)
+
 class DevelopmentConfig(Config):
     """
     Development configuration settings
