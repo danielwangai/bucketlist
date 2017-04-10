@@ -12,5 +12,10 @@ def create_db():
         db.create_all()
         print("Database successfully created.")
 
+@manager.command
+def drop_db():
+    """Management command to drop db."""
+    db.drop_all()
+
 if __name__ == '__main__':
     manager.run()
