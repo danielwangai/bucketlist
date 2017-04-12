@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from app import db
+from app import db, app
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -27,15 +27,14 @@ class Bucketlist(db.Model):
     name = db.Column(db.String(200))
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship('User', backref=db.backref('users', lazy='dynamic'))
+    # created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # user = db.relationship('User', backref=db.backref('users', lazy='dynamic'))
 
-    def __init__(self, name, user):
+    def __init__(self, name):
         self.id = id(self)
         self.name = name
         self.created_at = datetime.utcnow()
         self.modified_at = None
-        self.user = user
     
     def __repr__(self):
         return '<Bucketlist %r>' % self.name
