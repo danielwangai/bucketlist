@@ -25,3 +25,27 @@ class CreateUser(Resource):
 
     def post(self):
         pass
+
+
+class BucketlistResources(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str, help='Wrong key', required=True)
+        self.reqparse.add_argument('description', type=str,
+                                   help='description cannot be blank', required=True)
+
+    def get(self, id=None):
+        """To return bucketlist(s)."""
+        pass
+
+    def post(self):
+        """To create a new bucketlist."""
+        pass
+
+    def put(self, id):
+        """To update a bucketlist."""
+        pass
+
+    def delete(self, id):
+        """To delete a bucketlist."""
+        pass
