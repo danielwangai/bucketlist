@@ -1,5 +1,6 @@
 import os
 
+
 class Config(object):
     """
     Common configuration settings
@@ -11,8 +12,9 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'bucketlist.db')
     SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    # environment variable for SECRET_KEY
+    SECRET_KEY = os.environ['SECRET_KEY']
 
-    SECRET_KEY = os.urandom(24)
 
 class DevelopmentConfig(Config):
     """
@@ -20,12 +22,14 @@ class DevelopmentConfig(Config):
     """
     DEBUG = True
 
+
 class TestingConfig(Config):
     """
     Testing configuration settings
     """
     TESTING = True
     DEBUG = False
+
 
 class ProductionConfig(Config):
     """
