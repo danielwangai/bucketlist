@@ -15,3 +15,13 @@ class UserLogin(Resource):
 
     def post(self):
         pass
+
+
+class CreateUser(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('username', type=str, help='Username required', required=True)
+        self.reqparse.add_argument('password', type=str, help='Password required', required=True)
+
+    def post(self):
+        pass
