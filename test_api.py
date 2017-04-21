@@ -108,6 +108,18 @@ class APIEndpointsTestCase(unittest.TestCase):
         # bad request
         self.assertEqual(response.status_code, 400)
 
+    def test_endpoint_creates_user(self):
+        """Test that endpoint creates user successfully."""
+        new_user = {
+            "username": "dan",
+            "password": "password123"
+        }
+        response = self.client.post('/api/v1/auth/register', data=json.dumps(
+            new_user
+        ))
+        # status CREATED
+        self.assertEqual(response.status_code, 201)
+
 
 if __name__ == '__main__':
     unittest.main()
