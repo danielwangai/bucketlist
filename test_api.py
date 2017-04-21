@@ -85,6 +85,18 @@ class APIEndpointsTestCase(unittest.TestCase):
         # invalid credentials
         self.assertEqual(response.status_code, 401)
 
+    def test_user_login_authenticates_valid_credentials(self):
+        """Test that endpoint authenticates valid credentials."""
+        user = {
+            "username": "dan",
+            "password": "password123"
+        }
+        response = self.client.post('/api/v1/auth/login', data=json.dumps(
+            user
+        ))
+        # valid user credentials - STATUS - OK
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
