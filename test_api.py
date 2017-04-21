@@ -120,6 +120,18 @@ class APIEndpointsTestCase(unittest.TestCase):
         # status CREATED
         self.assertEqual(response.status_code, 201)
 
+    def test_endpoint_rejects_duplicate_username(self):
+        """Test that endpoint rejects creating duplicate usernames."""
+        new_user = {
+            "username": "dan",
+            "password": "password123"
+        }
+        response = self.client.post('/api/v1/auth/register', data=json.dumps(
+            new_user
+        ))
+        # duplicate record found
+        self.assertEqual(response.status_code, 409)
+
 
 if __name__ == '__main__':
     unittest.main()
