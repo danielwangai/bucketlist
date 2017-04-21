@@ -39,4 +39,4 @@ class Item(db.Model):
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
 
     def __repr__(self):
-        return '<Task %r>' % self.name
+        return '<Item %r>' % self.name

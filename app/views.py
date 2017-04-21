@@ -49,3 +49,27 @@ class BucketlistResources(Resource):
     def delete(self, id):
         """To delete a bucketlist."""
         pass
+
+
+class BucketlistItemResources(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument('name', type=str,
+                                   help='The key name required.',
+                                   required=True)
+
+    def get(self, id=None):
+        """To return task(s)."""
+        pass
+
+    def post(self):
+        """To create a new item."""
+        pass
+
+    def put(self, id):
+        """To update an item."""
+        pass
+
+    def delete(self, id):
+        """To delete an item."""
+        pass
