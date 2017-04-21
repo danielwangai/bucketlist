@@ -42,6 +42,15 @@ class APIEndpointsTestCase(unittest.TestCase):
                                     data=json.dumps(bucketlist))
         self.assertEqual(response.status_code, 200)
 
+    def test_delete_bucketlist(self):
+        """Test endpoint deletes bucketlist."""
+        bucketlist = {
+            "name": "Crack Game theory, updated."
+        }
+        response = self.client.delete('/api/v1/bucketlists/1',
+                                      data=json.dumps(bucketlist))
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
