@@ -132,6 +132,19 @@ class APIEndpointsTestCase(unittest.TestCase):
         # duplicate record found
         self.assertEqual(response.status_code, 409)
 
+    def test_endpoint_reject_short_password(self):
+        """Test that endpoint rejects creating user with short password."""
+        # password should be atleast 8 characters long
+        new_user = {
+            "username": "dan",
+            "password": "short"
+        }
+        response = self.client.post('/api/v1/auth/register', data=json.dumps(
+            new_user
+        ))
+        # bad request
+        self.assertEqual(response.status_code, 400)
+
 
 if __name__ == '__main__':
     unittest.main()
