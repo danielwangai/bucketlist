@@ -33,6 +33,15 @@ class APIEndpointsTestCase(unittest.TestCase):
             new_bucketlist))
         self.assertEqual(response.status_code, 201)
 
+    def test_update_bucketlist(self):
+        """Test endpoint updates bucketlist."""
+        bucketlist = {
+            "name": "Crack Game theory, updated."
+        }
+        response = self.client.post('/api/v1/bucketlists/1',
+                                    data=json.dumps(bucketlist))
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()
