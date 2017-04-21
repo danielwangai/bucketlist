@@ -1,8 +1,8 @@
 from flask import g
 from flask_restful import Resource, reqparse
 
-from app import db, app
-from app.models import Bucketlist, Task, User
+from app import db
+from app.models import Bucketlist, Item, User
 
 
 class UserLogin(Resource):

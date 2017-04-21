@@ -6,12 +6,12 @@ from flask_restful import Api
 from flask_script import Manager
 
 from config import configurations  # QLALCHEMY_MIGRATE_REPO
-from app import db
-from app.models import User, Bucketlist, Task
+from app import db, app
+from app.models import User, Bucketlist, Item
 from app.views import UserLogin, CreateUser, BucketlistResources
 
 
-app = Flask(__name__, instance_relative_config=True)
+# app = Flask(__name__, instance_relative_config=True)
 app.config.from_object(configurations["development"])
 # add configuration settings from instance/config.py
 app.config.from_pyfile('config.py')

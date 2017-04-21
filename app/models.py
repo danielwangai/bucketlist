@@ -3,9 +3,11 @@ from datetime import datetime
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from app import db, app
+from app import db
+
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(20))
     last_name = db.Column(db.String(20))
@@ -22,12 +24,14 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+
 class Bucketlist(db.Model):
+    __tablename__ = 'bucketlists'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
-    # created_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    # created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     # user = db.relationship('User', backref=db.backref('users', lazy='dynamic'))
 
     def __init__(self, name):
@@ -35,17 +39,19 @@ class Bucketlist(db.Model):
         self.name = name
         self.created_at = datetime.utcnow()
         self.modified_at = None
-    
+
     def __repr__(self):
         return '<Bucketlist %r>' % self.name
 
-class Task(db.Model):
+
+class Item(db.Model):
+    __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
     done = db.Column(db.Boolean, default=False)
-    bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlist.id'))
+    bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
     bucketlist = db.relationship('Bucketlist', backref=db.backref('bucketlists', lazy='dynamic'))
 
     def __init__(self, name, bucketlist):
@@ -55,6 +61,6 @@ class Task(db.Model):
         self.created_at = datetime.utcnow()
         self.modified_at = None
         self.bucketlist = bucketlist
-    
+
     def __repr__(self):
         return '<Task %r>' % self.name
