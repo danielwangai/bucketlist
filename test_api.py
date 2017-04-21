@@ -97,6 +97,17 @@ class APIEndpointsTestCase(unittest.TestCase):
         # valid user credentials - STATUS - OK
         self.assertEqual(response.status_code, 200)
 
+    def test_create_user_rejects_invalid_params(self):
+        """Test that endpoint rejects invalid params."""
+        user = {
+            "invalid1": "dan",
+            "invalid2": "password123"
+        }
+        response = self.client.post('/api/v1/auth/register', data=json.dumps(
+            user))
+        # bad request
+        self.assertEqual(response.status_code, 400)
+
 
 if __name__ == '__main__':
     unittest.main()
