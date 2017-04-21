@@ -16,12 +16,12 @@ class APIEndpointsTestCase(unittest.TestCase):
 
     def test_fetch_all_bucketlists(self):
         """Test that endpoint fetches all bucketlists."""
-        response = self.client.get("/v1/bucketlists/")
+        response = self.client.get("/api/v1/bucketlists")
         self.assertEqual(response.status_code, 200)
 
     def test_fetch_single_bucketlist(self):
         """Test that endpoint fetches a single bucketlist."""
-        response = self.client.get('/v1/bucketlists/1/')
+        response = self.client.get('/api/v1/bucketlists/1')
         self.assertEqual(response.status_code, 200)
 
     def test_post_new_bucketlist(self):
@@ -29,7 +29,7 @@ class APIEndpointsTestCase(unittest.TestCase):
         new_bucketlist = {
             "name": "Crack Game theory."
         }
-        response = self.client.post('/v1/bucketlists/', data=json.dumps(
+        response = self.client.post('/api/v1/bucketlists', data=json.dumps(
             new_bucketlist))
         self.assertEqual(response.status_code, 201)
 
