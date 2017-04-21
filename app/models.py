@@ -31,8 +31,8 @@ class Bucketlist(db.Model):
     name = db.Column(db.String(200))
     created_at = db.Column(db.DateTime)
     modified_at = db.Column(db.DateTime)
-    # created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    # user = db.relationship('User', backref=db.backref('users', lazy='dynamic'))
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
+    items = db.relationship('Item', backref='bucketlist', lazy='dynamic')
 
     def __init__(self, name):
         self.id = id(self)
@@ -52,7 +52,6 @@ class Item(db.Model):
     modified_at = db.Column(db.DateTime)
     done = db.Column(db.Boolean, default=False)
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
-    bucketlist = db.relationship('Bucketlist', backref=db.backref('bucketlists', lazy='dynamic'))
 
     def __init__(self, name, bucketlist):
         self.id = id(self)
