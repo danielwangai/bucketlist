@@ -62,6 +62,17 @@ class APIEndpointsTestCase(unittest.TestCase):
         # bad request
         self.assertEqual(response.status_code, 400)
 
+    def test_user_login_with_empty_fields(self):
+        """Test that endpoint rejects authenticating user with empty fields."""
+        user = {
+            "username": "",
+            "password": ""
+        }
+        response = self.client.post('/api/v1/auth/login', data=json.dumps(
+            user))
+        # bad request
+        self.assertEqual(response.status_code, 400)
+
 
 if __name__ == '__main__':
     unittest.main()
