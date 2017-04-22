@@ -19,4 +19,9 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     db.init_app(app)
 
+    migrate = Migrate(app, db)
+
+    manager = Manager(app)
+    manager.add_command('db', MigrateCommand)
+
     return app
