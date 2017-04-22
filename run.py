@@ -13,6 +13,15 @@ from app.views import UserLogin, CreateUser, BucketlistResources
 
 app = create_app(configurations["development"])
 
+# create api object
+api = Api(app)
+
+# api endpoints
+api.add_resource(BucketlistResources, "/api/v1/bucketlists",
+                 "/api/v1/bucketlists/<int:id>", endpoint='bucketlist')
+api.add_resource(UserLogin, '/api/v1/auth/login', endpoint="login")
+api.add_resource(CreateUser, '/api/v1/auth/register', endpoint="user_registration")
+
 if __name__ == '__main__':
     # manager.run()
     app.run(debug=True, host='127.0.0.1', port=5000)
