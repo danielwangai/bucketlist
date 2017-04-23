@@ -25,6 +25,16 @@ class Bucketlist(db.Model):
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     items = db.relationship('Item', backref='bucketlist', lazy='dynamic')
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "created_at": self.created_at,
+            "modified_at": self.modified_at,
+            "created_by": self.created_by.username,
+            "items": [{item.to_json} for item in self.items]
+        }
+
     def __repr__(self):
         return '<Bucketlist %r>' % self.name
 
@@ -37,6 +47,16 @@ class Item(db.Model):
     modified_at = db.Column(db.DateTime)
     done = db.Column(db.Boolean, default=False)
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "created_at": self.created_at,
+            "modified_at": self.modified_at,
+            "done": self.done,
+            "bucketlist_id": self.bucketlist_id
+        }
 
     def __repr__(self):
         return '<Item %r>' % self.name
