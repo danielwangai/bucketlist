@@ -1,5 +1,7 @@
 import os
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 
 class Config(object):
     """
@@ -8,9 +10,7 @@ class Config(object):
     DEBUG = False
     # TESTING = False
     # CSRF_ENABLED = True
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'bucketlist.db')
-    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
+    # SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     # environment variable for SECRET_KEY
     SECRET_KEY = os.environ['SECRET_KEY']
@@ -27,8 +27,15 @@ class TestingConfig(Config):
     """
     Testing configuration settings
     """
+    basedir = os.path.abspath(os.path.dirname(__file__))
+
     TESTING = True
     DEBUG = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    # environment variable for SECRET_KEY
+    SECRET_KEY = os.environ['SECRET_KEY']
+    SQLALCHEMY_DATABASE_URI = ('sqlite:///' + os.path.join(basedir,
+                                                           'bucketlist.db'))
 
 
 class ProductionConfig(Config):
