@@ -31,7 +31,7 @@ class Bucketlist(db.Model):
             "name": self.name,
             "created_at": self.created_at,
             "modified_at": self.modified_at,
-            "created_by": self.created_by.username,
+            # "created_by": self.created_by.username,
             "items": [{item.to_json} for item in self.items]
         }
 

@@ -11,7 +11,7 @@ from app.models import User, Bucketlist, Item
 from app.views import UserLogin, CreateUser, BucketlistResources
 
 
-app = create_app(configurations["development"])
+app = create_app("development")
 
 # api endpoints
 api.add_resource(BucketlistResources, "/api/v1/bucketlists",

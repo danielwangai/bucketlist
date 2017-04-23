@@ -1,18 +1,11 @@
-"""Tests for API endpoints."""
-import unittest
 import json
+from app.models import Bucketlist, Item, User
 
-# local imports
-from app import app
+from tests import BaseTestCase
 
 
-class APIEndpointsTestCase(unittest.TestCase):
+class APIEndpointsTestCase(BaseTestCase):
     """Test for API endpoints."""
-
-    def setUp(self):
-        """Test wide variables."""
-        self.app = app.app_context()
-        self.client = app.test_client()
 
     def test_fetch_all_bucketlists(self):
         """Test that endpoint fetches all bucketlists."""
@@ -29,8 +22,7 @@ class APIEndpointsTestCase(unittest.TestCase):
         new_bucketlist = {
             "name": "Crack Game theory."
         }
-        response = self.client.post('/api/v1/bucketlists', data=json.dumps(
-            new_bucketlist))
+        response = self.client.post('/api/v1/bucketlists', data=new_bucketlist)
         self.assertEqual(response.status_code, 201)
 
     def test_update_bucketlist(self):
@@ -38,8 +30,7 @@ class APIEndpointsTestCase(unittest.TestCase):
         bucketlist = {
             "name": "Crack Game theory, updated."
         }
-        response = self.client.post('/api/v1/bucketlists/1',
-                                    data=json.dumps(bucketlist))
+        response = self.client.put('/api/v1/bucketlists/1', data=bucketlist)
         self.assertEqual(response.status_code, 200)
 
     def test_delete_bucketlist(self):
@@ -47,8 +38,7 @@ class APIEndpointsTestCase(unittest.TestCase):
         bucketlist = {
             "name": "Crack Game theory, updated."
         }
-        response = self.client.delete('/api/v1/bucketlists/1',
-                                      data=json.dumps(bucketlist))
+        response = self.client.delete('/api/v1/bucketlists/1', data=bucketlist)
         self.assertEqual(response.status_code, 200)
 
     def test_login_rejects_invalid_params(self):
@@ -57,8 +47,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "invalid1": "dan",
             "invalid2": "password123"
         }
-        response = self.client.post('/api/v1/auth/login', data=json.dumps(
-            user))
+        response = self.client.post('/api/v1/auth/login', data=user)
         # bad request
         self.assertEqual(response.status_code, 400)
 
@@ -68,8 +57,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "",
             "password": ""
         }
-        response = self.client.post('/api/v1/auth/login', data=json.dumps(
-            user))
+        response = self.client.post('/api/v1/auth/login', data=user)
         # bad request
         self.assertEqual(response.status_code, 400)
 
@@ -79,9 +67,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "invalid_username",
             "password": "invalid password"
         }
-        response = self.client.post('/api/v1/auth/login', data=json.dumps(
-            user
-        ))
+        response = self.client.post('/api/v1/auth/login', data=user)
         # invalid credentials
         self.assertEqual(response.status_code, 401)
 
@@ -91,9 +77,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "dan",
             "password": "password123"
         }
-        response = self.client.post('/api/v1/auth/login', data=json.dumps(
-            user
-        ))
+        response = self.client.post('/api/v1/auth/login', data=user)
         # valid user credentials - STATUS - OK
         self.assertEqual(response.status_code, 200)
 
@@ -103,8 +87,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "invalid1": "dan",
             "invalid2": "password123"
         }
-        response = self.client.post('/api/v1/auth/register', data=json.dumps(
-            user))
+        response = self.client.post('/api/v1/auth/register', data=user)
         # bad request
         self.assertEqual(response.status_code, 400)
 
@@ -114,9 +97,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "dan",
             "password": "password123"
         }
-        response = self.client.post('/api/v1/auth/register', data=json.dumps(
-            new_user
-        ))
+        response = self.client.post('/api/v1/auth/register', data=new_user)
         # status CREATED
         self.assertEqual(response.status_code, 201)
 
@@ -126,9 +107,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "dan",
             "password": "password123"
         }
-        response = self.client.post('/api/v1/auth/register', data=json.dumps(
-            new_user
-        ))
+        response = self.client.post('/api/v1/auth/register', data=new_user)
         # duplicate record found
         self.assertEqual(response.status_code, 409)
 
@@ -139,9 +118,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "dan",
             "password": "short"
         }
-        response = self.client.post('/api/v1/auth/register', data=json.dumps(
-            new_user
-        ))
+        response = self.client.post('/api/v1/auth/register', data=new_user)
         # bad request
         self.assertEqual(response.status_code, 400)
 
@@ -152,9 +129,7 @@ class APIEndpointsTestCase(unittest.TestCase):
             "username": "",
             "password": ""
         }
-        response = self.client.post('/api/v1/auth/register', data=json.dumps(
-            new_user
-        ))
+        response = self.client.post('/api/v1/auth/register', data=new_user)
         # bad request
         self.assertEqual(response.status_code, 400)
 
