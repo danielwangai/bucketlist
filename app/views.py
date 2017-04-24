@@ -103,10 +103,11 @@ class BucketlistResources(Resource):
             if data.get(value).isspace() or not data.get(value):
                 return {'error': 'Invalid parameter.'}, 400
 
-        if Bucketlist.query.filter_by(name=data["name"]).first():
+        if Bucketlist.query.filter_by(name=data["name"],
+                                      created_by=g.user.id).first():
             return {'error': 'The bucketlist already exists'}, 409
 
-        bucketlist = Bucketlist(name=data["name"])
+        bucketlist = Bucketlist(name=data["name"], created_by=g.user.id)
         db.session.add(bucketlist)
         db.session.commit()
         return {"msg": "Bucketlist created successfully.",
@@ -122,14 +123,19 @@ class BucketlistResources(Resource):
             return {"error": "Buckelist of given id does not exist."}, 404
 
         if args["name"]:
-            if Bucketlist.query.filter_by(name=args["name"]).first():
-                # check if bucket with same name exists
-                return {"error": "Cannot update bucket with same name."}, 409
+            if bucket.created_by == g.user.id:
+                if Bucketlist.query.filter_by(name=args["name"]).first():
+                    # check if bucket with same name exists
+                    return ({"error": "Cannot update bucket with same name."},
+                            409)
+                else:
+                    bucket.name = args["name"]
+                    db.session.add(bucket)
+                    db.session.commit()
+                    return {"msg": "Update successful."}, 200
             else:
-                bucket.name = args["name"]
-                db.session.add(bucket)
-                db.session.commit()
-                return {"msg": "Update successful."}, 200
+                return ({"error": "You can only update your own bucketlist."},
+                        400)
         else:
             return {"error": "Cannot update to empty value."}, 400
 
