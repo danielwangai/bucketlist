@@ -85,6 +85,7 @@ class BucketlistResources(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str,
                                    help='Wrong key', required=True)
+        self.reqparse.add_argument('description', type=str, help='Wrong key')
 
     @auth.login_required
     def get(self, id=None):
@@ -199,14 +200,42 @@ class BucketlistItemResources(Resource):
                                    required=True)
         self.reqparse.add_argument('status', type=bool,
                                    help='status of the item')
+        # self.reqparse.add_argument('description', type=str,
+        #                            help='Description required',
+        #                            required=True)
 
-    def get(self, id=None):
+    def get(self, bucketlist_id=None):
         """To return task(s)."""
         pass
 
-    def post(self):
+    @auth.login_required
+    def post(self, bucketlist_id):
         """To create a new item."""
-        pass
+        args = self.reqparse.parse_args()
+        bucketlist = Bucketlist.query.get(bucketlist_id)
+        # for invalid bucketlist id
+        if not bucketlist:
+            return {"error": "Invalid bucketlist id."}, 404
+        # prevent unauthorized access
+        if bucketlist.created_by != g.user.id:
+            return {"error": "Unathorized Access!"}, 403
+
+        # search if item with current name exists
+        bucketlist_item = Item.query.filter_by(name=args['name']).first()
+        if bucketlist_item:
+            return {"error": "Cannot create duplicate item names."}, 409
+
+        if not args["name"]:
+            return {"error": "Must set item name."}, 400
+
+        bucketlist_id = bucketlist.id
+        item = Item(name=args['name'],
+                    done=False,
+                    bucketlist_id=bucketlist_id)
+        db.session.add(item)
+        db.session.commit()
+
+        return {"msg": "Bucket item created successfully."}, 201
 
     def put(self, id):
         """To update an item."""
