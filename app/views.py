@@ -79,6 +79,8 @@ class CreateUser(Resource):
 
 
 class BucketlistResources(Resource):
+    """To perform CRUD on Bucetlists."""
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str,
@@ -188,11 +190,15 @@ class BucketlistResources(Resource):
 
 
 class BucketlistItemResources(Resource):
+    """To perform CRUD on Bucetlist Items."""
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str,
                                    help='The key name required.',
                                    required=True)
+        self.reqparse.add_argument('status', type=bool,
+                                   help='status of the item')
 
     def get(self, id=None):
         """To return task(s)."""
