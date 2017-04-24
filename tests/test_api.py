@@ -51,6 +51,23 @@ class APIEndpointsTestCase(BaseTestCase):
                          "No such bucketlist not exists.")
         self.assertEqual(response.status_code, 404)
 
+    def test_unauthorized_bucketlist_fetch(self):
+        """Test unauthorized bucketlist fetch."""
+        new_bucketlist = {
+            "name": "Crack Game theory."
+        }
+        response = self.client.post('/api/v1/bucketlists', data=new_bucketlist,
+                                    headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully.")
+        self.assertEqual(response.status_code, 201)
+        # attempt fetch
+        response = self.client.get("/api/v1/bucketlists/1",
+                                   headers=self.headers_2)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Cannot fetch bucketlist you don't own.")
+        self.assertEqual(response.status_code, 403)
+
     def test_post_new_bucketlist(self):
         """Test endpoint saves new bucketlist."""
         new_bucketlist = {
