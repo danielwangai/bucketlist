@@ -55,3 +55,21 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Invalid bucketlist id."
                          )
         self.assertEqual(response.status_code, 404)
+
+    def test_update_item_successfully(self):
+        """To test that endpoint updates successfully."""
+        # create an item
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # update item
+        response = self.client.put('/api/v1/bucketlists/1/items/1',
+                                   data={"name": "update"},
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Item update successful."
+                         )
+        self.assertEqual(response.status_code, 200)
