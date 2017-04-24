@@ -38,8 +38,8 @@ class BaseTestCase(unittest.TestCase):
             self.response.data.decode('utf-8'))
 
         # get auth token
-        self.token = (self.response_data_in_json_format['token'])
-        self.headers = {'token': self.token}
+        self.token = (self.response_data_in_json_format['Authorization'])
+        self.headers = {'Authorization': self.token}
 
     def tearDown(self):
         db.session.remove()
