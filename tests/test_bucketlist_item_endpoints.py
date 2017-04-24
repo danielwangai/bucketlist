@@ -91,3 +91,21 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Cannot update with same name."
                          )
         self.assertEqual(response.status_code, 400)
+
+    def test_update_with_empty_name(self):
+        """To test that endpoint rejects update with empty name."""
+        # create an item
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # update item
+        response = self.client.put('/api/v1/bucketlists/1/items/1',
+                                   data={"name": ""},
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Cannot update with empty name."
+                         )
+        self.assertEqual(response.status_code, 400)
