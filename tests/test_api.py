@@ -103,6 +103,31 @@ class APIEndpointsTestCase(BaseTestCase):
         self.assertEqual(json.loads(response.data)["error"],
                          "Cannot update bucket with same name."
                          )
+        self.assertEqual(response.status_code, 409)
+
+    def test_update_bucketlist_with_empty_values(self):
+        """Test endpoint updates bucketlist."""
+        bucketlist = {
+            "name": "Crack Game theory."
+        }
+        # create bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=bucketlist,
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully."
+                         )
+        self.assertEqual(response.status_code, 201)
+        # update bucketlist
+        bucket_update = {
+            "name": ""
+        }
+        response = self.client.put('/api/v1/bucketlists/1', data=bucket_update,
+                                   headers=self.headers
+                                   )
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Cannot update to empty value."
+                         )
         self.assertEqual(response.status_code, 400)
 
     def test_delete_bucketlist(self):
