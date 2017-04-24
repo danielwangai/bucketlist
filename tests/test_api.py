@@ -177,6 +177,28 @@ class APIEndpointsTestCase(BaseTestCase):
                          )
         self.assertEqual(response.status_code, 200)
 
+    def test_delete_inexistent_bucketlist(self):
+        """Test reject deleting inexistent bucketlist."""
+        bucketlist = {
+            "name": "Crack Game theory."
+        }
+        # create bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=bucketlist,
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully."
+                         )
+        self.assertEqual(response.status_code, 201)
+        # attempt delete
+        response = self.client.delete('/api/v1/bucketlists/1234',
+                                      data=bucketlist, headers=self.headers
+                                      )
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Bucket does not exist."
+                         )
+        self.assertEqual(response.status_code, 404)
+
     def test_user_login_authenticates_valid_credentials(self):
         """Test that endpoint authenticates valid credentials."""
         response = self.client.post(
