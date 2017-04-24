@@ -283,8 +283,8 @@ class APIEndpointsTestCase(BaseTestCase):
         self.assertEqual(200, response.status_code)
         # confirm that token is in response
         self.assertIn("Authorization", response.data.decode("ascii"))
-        self.assertEqual(self.token,
-                         json.loads(response.data)["Authorization"])
+        self.assertEqual(json.loads(response.data)["Authorization"],
+                         self.token)
 
     def test_login_rejects_invalid_params(self):
         """Test that endpoint rejects invalid params."""

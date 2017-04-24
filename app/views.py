@@ -84,9 +84,40 @@ class BucketlistResources(Resource):
         self.reqparse.add_argument('name', type=str,
                                    help='Wrong key', required=True)
 
+    @auth.login_required
     def get(self, id=None):
         """To return bucketlist(s)."""
-        pass
+        if id:
+            bucketlist = Bucketlist.query.filter_by(id=id).first()
+            if bucketlist:
+                if bucketlist.created_by == g.user.id:
+                    # if bucket list was created by current user
+                    return {"msg": "Bucketlist fetched successfully",
+                            "data": {"id": bucketlist.id,
+                                     "name": bucketlist.name,
+                                     "created_at": str(bucketlist.created_at),
+                                     "modified_at":
+                                     str(bucketlist.modified_at),
+                                     "created_by": bucketlist.created_by,
+                                     "items": [{item.to_json}
+                                               for item in bucketlist.items]
+                                     }
+                            }, 200
+                else:
+                    return (
+                        {"error": "Cannot fetch bucketlist you don't own."},
+                        403)
+            else:
+                return {"error": "No such bucketlist not exists."}, 404
+        else:
+            bucketlists = Bucketlist.query.filter_by(created_by=g.user.id)
+            lst = []
+            if bucketlists:
+                for bucketlist in bucketlists:
+                    lst.append(bucketlist.to_json())
+                return {"msg": "Fetched all my bucketlists.", "data": lst}, 200
+            else:
+                return {"error": "You have no bucketlists"}, 404
 
     @auth.login_required
     def post(self):
