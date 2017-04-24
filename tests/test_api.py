@@ -65,16 +65,6 @@ class APIEndpointsTestCase(BaseTestCase):
 
     def test_user_login_reject_invalid_credentials(self):
         """Test that endpoint authenticating rejects invalid credentials."""
-        user = {
-            "username": "invalid_username",
-            "password": "invalid password"
-        }
-        response = self.client.post('/api/v1/auth/login', data=user)
-        # invalid credentials
-        self.assertEqual(response.status_code, 401)
-
-    def test_user_login_reject_invalid_credentials(self):
-        """Test that endpoint authenticating rejects invalid credentials."""
         response = self.client.post(
             '/api/v1/auth/login',
             data=json.dumps({
@@ -83,6 +73,7 @@ class APIEndpointsTestCase(BaseTestCase):
             content_type='application/json')
         self.assertEqual('invalid username password combination',
                          json.loads(response.data)['msg'])
+        self.assertEqual(401, response.status_code)
 
     def test_create_user_rejects_invalid_params(self):
         """Test that endpoint rejects invalid params."""
@@ -97,7 +88,7 @@ class APIEndpointsTestCase(BaseTestCase):
     def test_endpoint_creates_user(self):
         """Test that endpoint creates user successfully."""
         new_user = {
-            "username": "dan",
+            "username": "maina",
             "password": "password123"
         }
         response = self.client.post('/api/v1/auth/register', data=new_user)
@@ -113,6 +104,9 @@ class APIEndpointsTestCase(BaseTestCase):
         response = self.client.post('/api/v1/auth/register', data=new_user)
         # duplicate record found
         self.assertEqual(response.status_code, 409)
+        self.assertEqual("A User with the same name already exists!",
+                         json.loads(response.data)["error"]
+                         )
 
     def test_endpoint_reject_short_password(self):
         """Test that endpoint rejects creating user with short password."""
