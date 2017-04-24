@@ -53,12 +53,14 @@ class APIEndpointsTestCase(BaseTestCase):
 
     def test_user_login_with_empty_fields(self):
         """Test that endpoint rejects authenticating user with empty fields."""
-        user = {
-            "username": "",
-            "password": ""
-        }
-        response = self.client.post('/api/v1/auth/login', data=user)
-        # bad request
+        response = self.client.post(
+            '/api/v1/auth/login',
+            data=json.dumps({
+                'username': '',
+                'password': ''}),
+            content_type='application/json')
+        self.assertEqual('Please provide all credentials',
+                         json.loads(response.data)['msg'])
         self.assertEqual(response.status_code, 400)
 
     def test_user_login_reject_invalid_credentials(self):
@@ -71,18 +73,16 @@ class APIEndpointsTestCase(BaseTestCase):
         # invalid credentials
         self.assertEqual(response.status_code, 401)
 
-    def test_user_login_authenticates_valid_credentials(self):
-        """Test that endpoint authenticates valid credentials."""
+    def test_user_login_reject_invalid_credentials(self):
+        """Test that endpoint authenticating rejects invalid credentials."""
         response = self.client.post(
             '/api/v1/auth/login',
             data=json.dumps({
-                'username': 'dan',
-                'password': 'password123'}),
+                'username': 'invalid1',
+                'password': 'invalid2'}),
             content_type='application/json')
-        self.assertEqual(200, response.status_code)
-        # confirm that token is in response
-        self.assertIn("token", response.data.decode("ascii"))
-        self.assertEqual(self.token, json.loads(response.data)["token"])
+        self.assertEqual('invalid username password combination',
+                         json.loads(response.data)['msg'])
 
     def test_create_user_rejects_invalid_params(self):
         """Test that endpoint rejects invalid params."""
@@ -116,24 +116,26 @@ class APIEndpointsTestCase(BaseTestCase):
 
     def test_endpoint_reject_short_password(self):
         """Test that endpoint rejects creating user with short password."""
-        # password should be atleast 8 characters long
         new_user = {
             "username": "dan",
             "password": "short"
         }
         response = self.client.post('/api/v1/auth/register', data=new_user)
-        # bad request
+        self.assertEqual("Password must be atleast 8 characters long!",
+                         json.loads(response.data)["error"]
+                         )
         self.assertEqual(response.status_code, 400)
 
     def test_endpoint_reject_create_user_with_empty_fields(self):
         """Test that endpoint rejects creating user with empty fields."""
-        # empty fields
         new_user = {
             "username": "",
             "password": ""
         }
         response = self.client.post('/api/v1/auth/register', data=new_user)
-        # bad request
+        self.assertEqual("Username and password required",
+                         json.loads(response.data)["error"]
+                         )
         self.assertEqual(response.status_code, 400)
 
 
