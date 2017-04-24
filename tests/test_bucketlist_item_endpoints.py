@@ -138,3 +138,21 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Invalid item id."
                          )
         self.assertEqual(response.status_code, 404)
+
+    def test_unauthorized_update(self):
+        """To test that endpoint rejects unauthorized update."""
+        # create an item
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # update item
+        response = self.client.put('/api/v1/bucketlists/1/items/1',
+                                   data={"name": "update"},
+                                   headers=self.headers_2)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Unauthorized update rejected."
+                         )
+        self.assertEqual(response.status_code, 403)
