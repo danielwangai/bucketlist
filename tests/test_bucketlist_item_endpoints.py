@@ -109,3 +109,14 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Cannot update with empty name."
                          )
         self.assertEqual(response.status_code, 400)
+
+    def test_update_with_invalid_bucketlist_id(self):
+        """To test that endpoint rejects update with invalid bucketlist_id."""
+        # update item
+        response = self.client.put('/api/v1/bucketlists/111/items/1',
+                                   data={"name": "update"},
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Invalid bucketlist id."
+                         )
+        self.assertEqual(response.status_code, 404)
