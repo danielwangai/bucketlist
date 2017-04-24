@@ -158,9 +158,23 @@ class APIEndpointsTestCase(BaseTestCase):
     def test_delete_bucketlist(self):
         """Test endpoint deletes bucketlist."""
         bucketlist = {
-            "name": "Crack Game theory, updated."
+            "name": "Crack Game theory."
         }
-        response = self.client.delete('/api/v1/bucketlists/1', data=bucketlist)
+        # create bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=bucketlist,
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully."
+                         )
+        self.assertEqual(response.status_code, 201)
+        # delete bucketlist
+        response = self.client.delete('/api/v1/bucketlists/1',
+                                      data=bucketlist, headers=self.headers
+                                      )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket deletion success."
+                         )
         self.assertEqual(response.status_code, 200)
 
     def test_user_login_authenticates_valid_credentials(self):
