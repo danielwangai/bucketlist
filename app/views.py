@@ -237,9 +237,31 @@ class BucketlistItemResources(Resource):
 
         return {"msg": "Bucket item created successfully."}, 201
 
-    def put(self, id):
+    @auth.login_required
+    def put(self, bucketlist_id, item_id):
         """To update an item."""
-        pass
+        args = self.reqparse.parse_args()
+        bucketlist = Bucketlist.query.get(bucketlist_id)
+
+        if not bucketlist:
+            return {"error": "Invalid bucketlist id."}, 404
+        # prevent unauthorized access
+        if bucketlist.created_by != g.user.id:
+            return {"error": "Unauthorized update rejected."}, 403
+
+        if not args["name"]:
+            return {"error": "Cannot update with empty name."}, 400
+
+        item = Item.query.get(item_id)
+        if item:
+            if item.name == args["name"]:
+                return {"error": "Cannot update with same name."}, 400
+            else:
+                item.name = args["name"]
+                db.session.commit()
+                return {"msg": "Item update successful."}, 200
+        else:
+            return {"error": "Invalid item id."}, 404
 
     def delete(self, id):
         """To delete an item."""
