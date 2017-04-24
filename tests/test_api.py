@@ -73,13 +73,16 @@ class APIEndpointsTestCase(BaseTestCase):
 
     def test_user_login_authenticates_valid_credentials(self):
         """Test that endpoint authenticates valid credentials."""
-        user = {
-            "username": "dan",
-            "password": "password123"
-        }
-        response = self.client.post('/api/v1/auth/login', data=user)
-        # valid user credentials - STATUS - OK
-        self.assertEqual(response.status_code, 200)
+        response = self.client.post(
+            '/api/v1/auth/login',
+            data=json.dumps({
+                'username': 'dan',
+                'password': 'password123'}),
+            content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        # confirm that token is in response
+        self.assertIn("token", response.data.decode("ascii"))
+        self.assertEqual(self.token, json.loads(response.data)["token"])
 
     def test_create_user_rejects_invalid_params(self):
         """Test that endpoint rejects invalid params."""
