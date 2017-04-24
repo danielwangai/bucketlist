@@ -9,13 +9,39 @@ class APIEndpointsTestCase(BaseTestCase):
 
     def test_fetch_all_bucketlists(self):
         """Test that endpoint fetches all bucketlists."""
-        response = self.client.get("/api/v1/bucketlists")
+        # create bucketlist
+        new_bucketlist = {
+            "name": "Crack Game theory."
+        }
+        response = self.client.post('/api/v1/bucketlists', data=new_bucketlist,
+                                    headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully.")
+        self.assertEqual(response.status_code, 201)
+        # fetch bucketlists
+        response = self.client.get("/api/v1/bucketlists",
+                                   headers=self.headers
+                                   )
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Fetched all my bucketlists.")
 
     def test_fetch_single_bucketlist(self):
         """Test that endpoint fetches a single bucketlist."""
-        response = self.client.get('/api/v1/bucketlists/1')
+        new_bucketlist = {
+            "name": "Crack Game theory."
+        }
+        response = self.client.post('/api/v1/bucketlists', data=new_bucketlist,
+                                    headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully.")
+        self.assertEqual(response.status_code, 201)
+        # fetch single bucketlist
+        response = self.client.get('/api/v1/bucketlists/1',
+                                   headers=self.headers)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist fetched successfully")
 
     def test_post_new_bucketlist(self):
         """Test endpoint saves new bucketlist."""
