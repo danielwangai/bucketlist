@@ -45,9 +45,26 @@ class APIEndpointsTestCase(BaseTestCase):
     def test_update_bucketlist(self):
         """Test endpoint updates bucketlist."""
         bucketlist = {
+            "name": "Crack Game theory."
+        }
+        # create bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=bucketlist,
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully."
+                         )
+        self.assertEqual(response.status_code, 201)
+        # update bucketlist
+        bucket_update = {
             "name": "Crack Game theory, updated."
         }
-        response = self.client.put('/api/v1/bucketlists/1', data=bucketlist)
+        response = self.client.put('/api/v1/bucketlists/1', data=bucket_update,
+                                   headers=self.headers
+                                   )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Update successful."
+                         )
         self.assertEqual(response.status_code, 200)
 
     def test_delete_bucketlist(self):
