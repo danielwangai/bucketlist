@@ -33,3 +33,14 @@ class BucketlistItemTestCase(BaseTestCase):
         self.assertEqual(json.loads(response.data)["error"],
                          "Cannot create duplicate item names."
                          )
+
+    def test_reject_empty_item_name(self):
+        """To test that endpoint rejects item with empty name."""
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=dict(name=""),
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Must set item name."
+                         )
+        self.assertEqual(response.status_code, 400)
