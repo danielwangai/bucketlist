@@ -39,7 +39,7 @@ class UserLogin(Resource):
             user = User.query.filter_by(username=args['username']).first()
             if user:
                 token = user.generate_auth_token()
-                return {'token': 'Token ' + token.decode('ascii')}, 200
+                return {'Authorization': 'Token ' + token.decode('ascii')}, 200
             else:
                 return {"msg": "invalid username password combination"}, 401
 
@@ -81,17 +81,36 @@ class CreateUser(Resource):
 class BucketlistResources(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('name', type=str, help='Wrong key', required=True)
-        self.reqparse.add_argument('description', type=str,
-                                   help='description cannot be blank', required=True)
+        self.reqparse.add_argument('name', type=str,
+                                   help='Wrong key', required=True)
 
     def get(self, id=None):
         """To return bucketlist(s)."""
         pass
 
+    @auth.login_required
     def post(self):
         """To create a new bucketlist."""
-        pass
+        args = self.reqparse.parse_args()
+
+        return self.validate_create_bucket_list(args)
+
+    def validate_create_bucket_list(self, data):
+        """To alidate details required for bucket list creation."""
+        values = ["name"]
+
+        for value in values:
+            if data.get(value).isspace() or not data.get(value):
+                return {'error': 'Invalid parameter.'}, 400
+
+        if Bucketlist.query.filter_by(name=data["name"]).first():
+            return {'error': 'The bucketlist already exists'}, 409
+
+        bucketlist = Bucketlist(name=data["name"])
+        db.session.add(bucketlist)
+        db.session.commit()
+        return {"msg": "Bucketlist created successfully.",
+                "bucket": bucketlist.to_json()}, 201
 
     def put(self, id):
         """To update a bucketlist."""
