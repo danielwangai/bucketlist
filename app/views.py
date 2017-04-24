@@ -21,7 +21,7 @@ def verify_token(token):
 
 class UserLogin(Resource):
     def __init__(self):
-        self.reqparse = reqparse.RequestParse()
+        self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('username', type=str,
                                    help='Username required', required=True)
         self.reqparse.add_argument('password', type=str,
@@ -32,13 +32,37 @@ class UserLogin(Resource):
 
 
 class CreateUser(Resource):
+    """Class to create a user."""
+
     def __init__(self):
+        """To add for arguments user registration endpoint."""
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('username', type=str, help='Username required', required=True)
-        self.reqparse.add_argument('password', type=str, help='Password required', required=True)
+        self.reqparse.add_argument('username', type=str,
+                                   help='Username required', required=True)
+        self.reqparse.add_argument('password', type=str,
+                                   help='Password required', required=True)
 
     def post(self):
-        pass
+        """To create a new user."""
+        args = self.reqparse.parse_args()
+        if not args['username'] or not args['password']:
+            return {'error': 'Username and password required'}, 400
+        else:
+            if len(args['password']) < 8:
+                return ({'error':
+                         'Password must be atleast 8 characters long!'
+                         }, 400)
+            else:
+                if User.query.filter_by(username=args['username']).first():
+                    # if user with given username exists
+                    return ({
+                        'error': 'A User with the same name already exists!'},
+                        409)
+                user = User(username=args['username'],
+                            password=args['password'])
+                db.session.add(user)
+                db.session.commit()
+                return {'success': 'User Registration success!'}, 201
 
 
 class BucketlistResources(Resource):
