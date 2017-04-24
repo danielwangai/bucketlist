@@ -14,6 +14,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), index=True)
     password = db.Column(db.String(128))
+    bucketlists = db.relationship('Bucketlist', backref='user',
+                                  cascade='all,delete', lazy='dynamic')
 
     def generate_auth_token(self, expiration=40000):
         """To generate auth token."""
@@ -41,18 +43,20 @@ class Bucketlist(db.Model):
     __tablename__ = 'bucketlists'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
-    created_at = db.Column(db.DateTime)
-    modified_at = db.Column(db.DateTime)
+    description = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    modified_at = db.Column(db.DateTime, default=datetime.now)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    items = db.relationship('Item', backref='bucketlist', lazy='dynamic')
+    items = db.relationship('Item', backref='bucketlist',
+                            cascade='all, delete', lazy='dynamic')
 
     def to_json(self):
         return {
             "id": self.id,
             "name": self.name,
-            "created_at": self.created_at,
-            "modified_at": self.modified_at,
-            # "created_by": self.created_by.username,
+            "created_at": str(self.created_at),
+            "modified_at": str(self.modified_at),
+            "created_by": self.created_by,
             "items": [{item.to_json} for item in self.items]
         }
 
@@ -64,8 +68,8 @@ class Item(db.Model):
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
-    created_at = db.Column(db.DateTime)
-    modified_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    modified_at = db.Column(db.DateTime, default=datetime.now)
     done = db.Column(db.Boolean, default=False)
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
 
