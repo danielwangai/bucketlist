@@ -212,11 +212,11 @@ class APIEndpointsTestCase(BaseTestCase):
                          "Bucketlist created successfully."
                          )
         self.assertEqual(response.status_code, 201)
-        # update bucketlist
+        # delete bucketlist
         response = self.client.delete('/api/v1/bucketlists/1',
                                       headers=self.headers_2
                                       )
-        self.assertEqual(json.loads(response.data)["msg"],
+        self.assertEqual(json.loads(response.data)["error"],
                          "Can only delete your own backetlist."
                          )
         self.assertEqual(response.status_code, 400)

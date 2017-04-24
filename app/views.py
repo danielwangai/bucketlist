@@ -139,9 +139,21 @@ class BucketlistResources(Resource):
         else:
             return {"error": "Cannot update to empty value."}, 400
 
+    @auth.login_required
     def delete(self, id):
         """To delete a bucketlist."""
-        pass
+        # fetch bucket
+        bucket = Bucketlist.query.filter_by(id=id).first()
+        if bucket:
+            if bucket.created_by == g.user.id:
+                # bucket exists
+                db.session.delete(bucket)
+                db.session.commit()
+                return ({'msg': 'Bucket deletion success.'}, 200)
+            elif bucket.created_by != g.user.id:
+                return {"error": "Can only delete your own backetlist."}, 400
+        else:
+            return ({'error': 'Bucket does not exist.'}, 404)
 
 
 class BucketlistItemResources(Resource):
