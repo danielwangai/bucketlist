@@ -1,6 +1,5 @@
 *.db
 *__pycache__
 /instance/*
-migrations/*
 .idea/
 .cache/
