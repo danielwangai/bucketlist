@@ -22,6 +22,8 @@ class BaseTestCase(unittest.TestCase):
         self.client = self.app.test_client()
         db.create_all()
         self.user_credentials = dict(username='dan', password='password123')
+        self.user_credentials_2 = dict(username='davy', password='password123')
+        self.bucket_1 = dict(name="bucket 1")
 
         # set api endpoints
         api.add_resource(BucketlistResources, "/api/v1/bucketlists",
@@ -31,15 +33,25 @@ class BaseTestCase(unittest.TestCase):
 
         # register a user
         self.client.post('/api/v1/auth/register', data=self.user_credentials)
+        self.client.post('/api/v1/auth/register', data=self.user_credentials_2)
 
         self.response = self.client.post('/api/v1/auth/login',
                                          data=self.user_credentials)
+        self.response_2 = self.client.post('/api/v1/auth/login',
+                                           data=self.user_credentials_2)
         self.response_data_in_json_format = json.loads(
             self.response.data.decode('utf-8'))
+
+        self.response_data_in_json_format_2 = json.loads(
+            self.response_2.data.decode('utf-8'))
 
         # get auth token
         self.token = (self.response_data_in_json_format['Authorization'])
         self.headers = {'Authorization': self.token}
+
+        # token for user 2
+        self.token_2 = (self.response_data_in_json_format_2['Authorization'])
+        self.headers_2 = {'Authorization': self.token_2}
 
     def tearDown(self):
         db.session.remove()
