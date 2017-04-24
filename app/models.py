@@ -1,7 +1,10 @@
+import os
 from datetime import datetime
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature, SignatureExpired)
 
 from app import db
 
@@ -11,6 +14,24 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), index=True)
     password = db.Column(db.String(128))
+
+    def generate_auth_token(self, expiration=40000):
+        """To generate auth token."""
+        s = Serializer(os.environ['SECRET_KEY'], expires_in=expiration)
+        return s.dumps({'id': self.id})
+
+    @staticmethod
+    def verify_auth_token(token):
+        """To verify token."""
+        s = Serializer(os.environ['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            return None  # valid token, but expired
+        except BadSignature:
+            return None  # invalid token
+        user = User.query.get(data['id'])
+        return user
 
     def __repr__(self):
         return '<User %r>' % self.username
