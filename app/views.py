@@ -20,7 +20,10 @@ def verify_token(token):
 
 
 class UserLogin(Resource):
+    """Class to authenticate a user."""
+
     def __init__(self):
+        """To add for arguments login endpoint."""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('username', type=str,
                                    help='Username required', required=True)
@@ -28,7 +31,17 @@ class UserLogin(Resource):
                                    help='Password required', required=True)
 
     def post(self):
-        pass
+        """To authenticate a user."""
+        args = self.reqparse.parse_args()
+        if not args['username'] or not args['password']:
+            return {'msg': 'Please provide all credentials'}, 400
+        else:
+            user = User.query.filter_by(username=args['username']).first()
+            if user:
+                token = user.generate_auth_token()
+                return {'token': 'Token ' + token.decode('ascii')}, 200
+            else:
+                return {"msg": "invalid username password combination"}, 401
 
 
 class CreateUser(Resource):
