@@ -16,3 +16,20 @@ class BucketlistItemTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(json.loads(response.data)["msg"],
                          "Bucket item created successfully.")
+
+    def test_reject_similar_item_name(self):
+        """To test that endpoint rejects similar bucketlist name."""
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Cannot create duplicate item names."
+                         )
