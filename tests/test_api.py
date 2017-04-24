@@ -28,6 +28,20 @@ class APIEndpointsTestCase(BaseTestCase):
                          "Bucketlist created successfully.")
         self.assertEqual(response.status_code, 201)
 
+    def test_recreate_bucketlist(self):
+        """Test endpoint rejects creating existing bucketlist."""
+        response = self.client.post('/api/v1/bucketlists', data=self.bucket_1,
+                                    headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully.")
+        self.assertEqual(response.status_code, 201)
+        # attempts recreating the same bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=self.bucket_1,
+                                    headers=self.headers)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "The bucketlist already exists")
+        self.assertEqual(response.status_code, 409)
+
     def test_update_bucketlist(self):
         """Test endpoint updates bucketlist."""
         bucketlist = {
