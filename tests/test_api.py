@@ -41,6 +41,19 @@ class APIEndpointsTestCase(BaseTestCase):
         response = self.client.delete('/api/v1/bucketlists/1', data=bucketlist)
         self.assertEqual(response.status_code, 200)
 
+    def test_user_login_authenticates_valid_credentials(self):
+        """Test that endpoint authenticates valid credentials."""
+        response = self.client.post(
+            '/api/v1/auth/login',
+            data=json.dumps({
+                'username': 'dan',
+                'password': 'password123'}),
+            content_type='application/json')
+        self.assertEqual(200, response.status_code)
+        # confirm that token is in response
+        self.assertIn("token", response.data.decode("ascii"))
+        self.assertEqual(self.token, json.loads(response.data)["token"])
+
     def test_login_rejects_invalid_params(self):
         """Test that endpoint rejects invalid params."""
         user = {
