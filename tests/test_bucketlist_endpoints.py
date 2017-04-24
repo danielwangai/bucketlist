@@ -83,12 +83,6 @@ class APIEndpointsTestCase(BaseTestCase):
         """Test endpoint rejects creating existing bucketlist."""
         response = self.client.post('/api/v1/bucketlists', data=self.bucket_1,
                                     headers=self.headers)
-        self.assertEqual(json.loads(response.data)["msg"],
-                         "Bucketlist created successfully.")
-        self.assertEqual(response.status_code, 201)
-        # attempts recreating the same bucketlist
-        response = self.client.post('/api/v1/bucketlists', data=self.bucket_1,
-                                    headers=self.headers)
         self.assertEqual(json.loads(response.data)["error"],
                          "The bucketlist already exists")
         self.assertEqual(response.status_code, 409)
