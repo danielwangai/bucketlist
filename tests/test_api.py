@@ -22,7 +22,10 @@ class APIEndpointsTestCase(BaseTestCase):
         new_bucketlist = {
             "name": "Crack Game theory."
         }
-        response = self.client.post('/api/v1/bucketlists', data=new_bucketlist)
+        response = self.client.post('/api/v1/bucketlists', data=new_bucketlist,
+                                    headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully.")
         self.assertEqual(response.status_code, 201)
 
     def test_update_bucketlist(self):
@@ -51,8 +54,9 @@ class APIEndpointsTestCase(BaseTestCase):
             content_type='application/json')
         self.assertEqual(200, response.status_code)
         # confirm that token is in response
-        self.assertIn("token", response.data.decode("ascii"))
-        self.assertEqual(self.token, json.loads(response.data)["token"])
+        self.assertIn("Authorization", response.data.decode("ascii"))
+        self.assertEqual(self.token,
+                         json.loads(response.data)["Authorization"])
 
     def test_login_rejects_invalid_params(self):
         """Test that endpoint rejects invalid params."""
