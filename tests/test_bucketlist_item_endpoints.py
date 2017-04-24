@@ -44,3 +44,14 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Must set item name."
                          )
         self.assertEqual(response.status_code, 400)
+
+    def test_cannot_invalid_bucketlist_id(self):
+        """To test that endpoint rejects item with invalid bucketlist_id."""
+        response = self.client.post('/api/v1/bucketlists/111/items',
+                                    data=dict(name="another bucket item"),
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Invalid bucketlist id."
+                         )
+        self.assertEqual(response.status_code, 404)
