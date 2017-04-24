@@ -112,9 +112,26 @@ class BucketlistResources(Resource):
         return {"msg": "Bucketlist created successfully.",
                 "bucket": bucketlist.to_json()}, 201
 
+    @auth.login_required
     def put(self, id):
         """To update a bucketlist."""
-        pass
+        bucket = Bucketlist.query.filter_by(id=id).first()
+        args = self.reqparse.parse_args()
+
+        if not bucket:
+            return {"error": "Buckelist of given id does not exist."}, 404
+
+        if args["name"]:
+            if Bucketlist.query.filter_by(name=args["name"]).first():
+                # check if bucket with same name exists
+                return {"error": "Cannot update bucket with same name."}, 409
+            else:
+                bucket.name = args["name"]
+                db.session.add(bucket)
+                db.session.commit()
+                return {"msg": "Update successful."}, 200
+        else:
+            return {"error": "Cannot update to empty value."}, 400
 
     def delete(self, id):
         """To delete a bucketlist."""
