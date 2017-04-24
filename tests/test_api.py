@@ -67,6 +67,31 @@ class APIEndpointsTestCase(BaseTestCase):
                          )
         self.assertEqual(response.status_code, 200)
 
+    def test_can_only_update_own_bucket(self):
+        """Test user can only update own bucket."""
+        bucketlist = {
+            "name": "Crack Game theory."
+        }
+        # create bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=bucketlist,
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully."
+                         )
+        self.assertEqual(response.status_code, 201)
+        # update bucketlist
+        bucket_update = {
+            "name": "Crack Game theory, updated."
+        }
+        response = self.client.put('/api/v1/bucketlists/1', data=bucket_update,
+                                   headers=self.headers_2
+                                   )
+        self.assertEqual(json.loads(response.data)["error"],
+                         "You can only update your own bucketlist."
+                         )
+        self.assertEqual(response.status_code, 400)
+
     def test_update_inexistent_bucket(self):
         """Test endpoint rejects updating inexistent bucketlist."""
         bucket_update = {
