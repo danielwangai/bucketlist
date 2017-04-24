@@ -43,6 +43,14 @@ class APIEndpointsTestCase(BaseTestCase):
         self.assertEqual(json.loads(response.data)["msg"],
                          "Bucketlist fetched successfully")
 
+    def test_fetch_bucketlist_with_wrong_id(self):
+        """Test that endpoint fetches a bucketlist with wrong id."""
+        response = self.client.get("/api/v1/bucketlists/12345",
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "No such bucketlist not exists.")
+        self.assertEqual(response.status_code, 404)
+
     def test_post_new_bucketlist(self):
         """Test endpoint saves new bucketlist."""
         new_bucketlist = {
