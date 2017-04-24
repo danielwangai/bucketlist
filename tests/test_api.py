@@ -199,6 +199,28 @@ class APIEndpointsTestCase(BaseTestCase):
                          )
         self.assertEqual(response.status_code, 404)
 
+    def test_only_delete_own_bucketlist(self):
+        """Test user can only delete own bucketlist."""
+        bucketlist = {
+            "name": "Crack Game theory."
+        }
+        # create bucketlist
+        response = self.client.post('/api/v1/bucketlists', data=bucketlist,
+                                    headers=self.headers
+                                    )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucketlist created successfully."
+                         )
+        self.assertEqual(response.status_code, 201)
+        # update bucketlist
+        response = self.client.delete('/api/v1/bucketlists/1',
+                                      headers=self.headers_2
+                                      )
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Can only delete your own backetlist."
+                         )
+        self.assertEqual(response.status_code, 400)
+
     def test_user_login_authenticates_valid_credentials(self):
         """Test that endpoint authenticates valid credentials."""
         response = self.client.post(
