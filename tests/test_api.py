@@ -67,6 +67,19 @@ class APIEndpointsTestCase(BaseTestCase):
                          )
         self.assertEqual(response.status_code, 200)
 
+    def test_update_inexistent_bucket(self):
+        """Test endpoint rejects updating inexistent bucketlist."""
+        bucket_update = {
+            "name": "Crack Game theory, updated."
+        }
+        response = self.client.put('/api/v1/bucketlists/12345',
+                                   data=bucket_update, headers=self.headers
+                                   )
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Buckelist of given id does not exist."
+                         )
+        self.assertEqual(response.status_code, 404)
+
     def test_delete_bucketlist(self):
         """Test endpoint deletes bucketlist."""
         bucketlist = {
