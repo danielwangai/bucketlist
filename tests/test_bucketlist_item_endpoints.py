@@ -156,3 +156,20 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Unauthorized update rejected."
                          )
         self.assertEqual(response.status_code, 403)
+
+    def test_delete_item_successfully(self):
+        """To test successful deletion."""
+        # create an item
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # delete item
+        response = self.client.delete('/api/v1/bucketlists/1/items/1',
+                                      headers=self.headers)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Item deletion successful."
+                         )
+        self.assertEqual(response.status_code, 200)
