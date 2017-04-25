@@ -263,6 +263,25 @@ class BucketlistItemResources(Resource):
         else:
             return {"error": "Invalid item id."}, 404
 
-    def delete(self, id):
+    @auth.login_required
+    def delete(self, bucketlist_id, item_id):
         """To delete an item."""
-        pass
+        # fetch bucketlist
+        bucketlist = Bucketlist.query.filter_by(id=bucketlist_id).first()
+
+        # Retrieve the item
+        item = Item.query.filter_by(id=item_id).first()
+
+        if not bucketlist:
+            return {"error": "Invalid bucketlist id."}, 404
+        # prevent unauthorized access
+        if bucketlist.created_by != g.user.id:
+            return {"error": "Unauthorized deltion rejected."}, 403
+
+        if not item:
+            return {"error": "Invalid item id."}, 404
+
+        db.session.delete(item)
+        db.session.commit()
+
+        return {"msg": "Item deletion successful."}, 200
