@@ -183,3 +183,20 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Invalid bucketlist id."
                          )
         self.assertEqual(response.status_code, 404)
+
+    def test_delete_item_with_invalid_item_id(self):
+        """To test that endpoint rejects delete if invalid item_id."""
+        # create an item
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # attempt deleting item
+        response = self.client.delete('/api/v1/bucketlists/1/items/111',
+                                      headers=self.headers)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Invalid item id."
+                         )
+        self.assertEqual(response.status_code, 404)
