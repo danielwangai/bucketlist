@@ -204,9 +204,36 @@ class BucketlistItemResources(Resource):
         #                            help='Description required',
         #                            required=True)
 
-    def get(self, bucketlist_id=None):
+    @auth.login_required
+    def get(self, bucketlist_id, item_id=None):
         """To return task(s)."""
-        pass
+        bucketlist = Bucketlist.query.get(bucketlist_id)
+
+        if not bucketlist:
+            return (
+                {"error": "Cannot fetch items with invalid bucketlist id."},
+                404)
+        # reject unauthorized access
+        if bucketlist:
+            # fetch all bucketlists
+            if not item_id:
+                items = []
+                for item in bucketlist.items:
+                    items.append({"id": item.id, "name": item.name})
+                return items, 200
+            if item_id:
+                # if type(item_id) is not int:
+                #     return {"error": "Item id must be integer."}, 400
+                # else:
+                    # if type is int
+                item = Item.query.get(item_id)
+                if item:
+                    return {"id": item.id, "name": item.name}, 200
+                else:
+                    return (
+                        {"error":
+                         "Cannot fetch item with invalid item id."},
+                        404)
 
     @auth.login_required
     def post(self, bucketlist_id):
