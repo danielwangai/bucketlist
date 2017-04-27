@@ -247,3 +247,19 @@ class BucketlistItemTestCase(BaseTestCase):
         self.assertEqual(json.loads(response.data)["id"], 1
                          )
         self.assertEqual(response.status_code, 200)
+
+    def test_fetch_items_with_invalid_bucketlist_id(self):
+        """To test that endpoint fetches items with invalid bucketlist_id."""
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # fetch all items
+        response = self.client.get('/api/v1/bucketlists/111/items',
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)["error"],
+                         "Cannot fetch items with invalid bucketlist id."
+                         )
+        self.assertEqual(response.status_code, 404)
