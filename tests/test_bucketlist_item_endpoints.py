@@ -232,3 +232,18 @@ class BucketlistItemTestCase(BaseTestCase):
         self.assertEqual(json.loads(response.data)[0]["id"], 1
                          )
         self.assertEqual(response.status_code, 200)
+
+    def test_fetch_single_item_successfully(self):
+        """To test that endpoint fetches single item successfully."""
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # fetch single item
+        response = self.client.get('/api/v1/bucketlists/1/items/1',
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)["id"], 1
+                         )
+        self.assertEqual(response.status_code, 200)
