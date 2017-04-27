@@ -217,3 +217,18 @@ class BucketlistItemTestCase(BaseTestCase):
                          "Unauthorized deltion rejected."
                          )
         self.assertEqual(response.status_code, 403)
+
+    def test_fetch_all_items_successfully(self):
+        """To test that endpoint fetches all items successfully."""
+        response = self.client.post('/api/v1/bucketlists/1/items',
+                                    data=self.bucket_item,
+                                    headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(json.loads(response.data)["msg"],
+                         "Bucket item created successfully.")
+        # fetch single item
+        response = self.client.get('/api/v1/bucketlists/1/items',
+                                   headers=self.headers)
+        self.assertEqual(json.loads(response.data)[0]["id"], 1
+                         )
+        self.assertEqual(response.status_code, 200)
