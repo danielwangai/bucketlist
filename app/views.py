@@ -1,4 +1,5 @@
-from flask import g
+import json
+from flask import g, Response
 from flask_httpauth import HTTPTokenAuth
 from flask_restful import Resource, reqparse
 
@@ -95,16 +96,17 @@ class BucketlistResources(Resource):
             if bucketlist:
                 if bucketlist.created_by == g.user.id:
                     # if bucket list was created by current user
-                    return {"msg": "Bucketlist fetched successfully",
-                            "data": {"id": bucketlist.id,
-                                     "name": bucketlist.name,
-                                     "created_at": str(bucketlist.created_at),
-                                     "modified_at":
-                                     str(bucketlist.modified_at),
-                                     "created_by": bucketlist.created_by,
-                                     "items": [{item.to_json}
-                                               for item in bucketlist.items]
-                                     }
+                    return {"id": bucketlist.id,
+                            "name": bucketlist.name,
+                            "created_at": str(bucketlist.created_at),
+                            "modified_at": str(bucketlist.modified_at),
+                            "created_by": bucketlist.created_by,
+                            "items": [{
+                                "id": item.id,
+                                "name": item.name,
+                                "done": item.done
+                            }
+                                for item in bucketlist.items]
                             }, 200
                 else:
                     return (
@@ -117,8 +119,20 @@ class BucketlistResources(Resource):
             lst = []
             if bucketlists:
                 for bucketlist in bucketlists:
-                    lst.append(bucketlist.to_json())
-                return {"msg": "Fetched all my bucketlists.", "data": lst}, 200
+                    lst.append({
+                        "id": bucketlist.id,
+                        "name": bucketlist.name,
+                        "created_at": str(bucketlist.created_at),
+                        "modified_at": str(bucketlist.modified_at),
+                        "created_by": bucketlist.created_by,
+                        "items": [{
+                            "id": item.id,
+                            "name": item.name,
+                            "done": item.done
+                        }
+                            for item in bucketlist.items]
+                    })
+                return lst  # , 200
             else:
                 return {"error": "You have no bucketlists"}, 404
 
@@ -232,7 +246,7 @@ class BucketlistItemResources(Resource):
                 else:
                     return (
                         {"error":
-                         "Cannot fetch item with invalid item id."},
+                         "Invalid Item id. Item not found."},
                         404)
 
     @auth.login_required
@@ -242,7 +256,7 @@ class BucketlistItemResources(Resource):
         bucketlist = Bucketlist.query.get(bucketlist_id)
         # for invalid bucketlist id
         if not bucketlist:
-            return {"error": "Invalid bucketlist id."}, 404
+            return {"error": "Bucketlist of given ID does not exist."}, 404
         # prevent unauthorized access
         if bucketlist.created_by != g.user.id:
             return {"error": "Unathorized Access!"}, 403
@@ -306,7 +320,7 @@ class BucketlistItemResources(Resource):
             return {"error": "Unauthorized deltion rejected."}, 403
 
         if not item:
-            return {"error": "Invalid item id."}, 404
+            return {"error": "Item not found."}, 404
 
         db.session.delete(item)
         db.session.commit()
