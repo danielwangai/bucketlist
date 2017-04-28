@@ -206,13 +206,13 @@ class BucketlistResources(Resource):
 
 class BucketlistItemResources(Resource):
     """To perform CRUD on Bucetlist Items."""
+    decorators = []
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str,
-                                   help='The key name required.',
-                                   required=True)
-        self.reqparse.add_argument('status', type=bool,
+                                   help='The key name required.')
+        self.reqparse.add_argument('status', type=str,
                                    help='status of the item')
         # self.reqparse.add_argument('description', type=str,
         #                            help='Description required',
@@ -233,7 +233,8 @@ class BucketlistItemResources(Resource):
             if not item_id:
                 items = []
                 for item in bucketlist.items:
-                    items.append({"id": item.id, "name": item.name})
+                    items.append({"id": item.id, "name": item.name,
+                                  "status": item.done})
                 return items, 200
             if item_id:
                 # if type(item_id) is not int:
@@ -242,7 +243,8 @@ class BucketlistItemResources(Resource):
                     # if type is int
                 item = Item.query.get(item_id)
                 if item:
-                    return {"id": item.id, "name": item.name}, 200
+                    return {"id": item.id, "name": item.name,
+                            "status": item.done}, 200
                 else:
                     return (
                         {"error":
@@ -283,25 +285,34 @@ class BucketlistItemResources(Resource):
         """To update an item."""
         args = self.reqparse.parse_args()
         bucketlist = Bucketlist.query.get(bucketlist_id)
-
+        item = Item.query.get(item_id)
         if not bucketlist:
             return {"error": "Invalid bucketlist id."}, 404
         # prevent unauthorized access
         if bucketlist.created_by != g.user.id:
             return {"error": "Unauthorized update rejected."}, 403
 
-        if not args["name"]:
-            return {"error": "Cannot update with empty name."}, 400
-
-        item = Item.query.get(item_id)
         if item:
-            if item.name == args["name"]:
-                return {"error": "Cannot update with same name."}, 400
-            else:
-                item.name = args["name"]
+            if args["status"] in ["True", "true"]:
+                item.name = args["name"] or item.name
+                item.done = True
                 db.session.commit()
                 return {"msg": "Item update successful."}, 200
-        else:
+            elif args["status"] in ["False", "false"]:
+                if args["name"]:
+                    if item.name == args["name"]:
+                        return {"error": "Cannot update with same name."}, 400
+                    else:
+                        item.name = args["name"] or item.name
+                        item.done = False
+                        db.session.commit()
+                        return {"msg": "Item update successful."}, 200
+                else:
+                    return {"error": "Cannot update with empty name."}, 400
+            else:
+                return {"error": "Status should be True or False"}, 400
+
+        elif not item:
             return {"error": "Invalid item id."}, 404
 
     @auth.login_required
