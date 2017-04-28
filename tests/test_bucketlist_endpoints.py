@@ -23,8 +23,7 @@ class APIEndpointsTestCase(BaseTestCase):
                                    headers=self.headers
                                    )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.data)["msg"],
-                         "Fetched all my bucketlists.")
+        self.assertTrue(len(json.loads(response.data)) > 0)
 
     def test_fetch_single_bucketlist(self):
         """Test that endpoint fetches a single bucketlist."""
@@ -40,8 +39,7 @@ class APIEndpointsTestCase(BaseTestCase):
         response = self.client.get('/api/v1/bucketlists/1',
                                    headers=self.headers)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(json.loads(response.data)["msg"],
-                         "Bucketlist fetched successfully")
+        self.assertEqual(json.loads(response.data)["id"], 1)
 
     def test_fetch_bucketlist_with_wrong_id(self):
         """Test that endpoint fetches a bucketlist with wrong id."""

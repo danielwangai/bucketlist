@@ -52,7 +52,7 @@ class BucketlistItemTestCase(BaseTestCase):
                                     headers=self.headers
                                     )
         self.assertEqual(json.loads(response.data)["error"],
-                         "Invalid bucketlist id."
+                         "Bucketlist of given ID does not exist."
                          )
         self.assertEqual(response.status_code, 404)
 
@@ -197,7 +197,7 @@ class BucketlistItemTestCase(BaseTestCase):
         response = self.client.delete('/api/v1/bucketlists/1/items/111',
                                       headers=self.headers)
         self.assertEqual(json.loads(response.data)["error"],
-                         "Invalid item id."
+                         "Item not found."
                          )
         self.assertEqual(response.status_code, 404)
 
@@ -276,6 +276,6 @@ class BucketlistItemTestCase(BaseTestCase):
         response = self.client.get('/api/v1/bucketlists/1/items/111',
                                    headers=self.headers)
         self.assertEqual(json.loads(response.data)["error"],
-                         "Cannot fetch item with invalid item id."
+                         "Invalid Item id. Item not found."
                          )
         self.assertEqual(response.status_code, 404)
