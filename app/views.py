@@ -132,7 +132,7 @@ class BucketlistResources(Resource):
                         }
                             for item in bucketlist.items]
                     })
-                return lst  # , 200
+                return lst, 200
             else:
                 return {"error": "You have no bucketlists"}, 404
 
@@ -237,10 +237,6 @@ class BucketlistItemResources(Resource):
                                   "status": item.done})
                 return items, 200
             if item_id:
-                # if type(item_id) is not int:
-                #     return {"error": "Item id must be integer."}, 400
-                # else:
-                    # if type is int
                 item = Item.query.get(item_id)
                 if item:
                     return {"id": item.id, "name": item.name,
