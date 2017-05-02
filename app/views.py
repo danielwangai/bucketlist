@@ -1,9 +1,10 @@
 import json
+from urllib.parse import urljoin
 from flask import g, Response
 from flask_httpauth import HTTPTokenAuth
 from flask_restful import Resource, reqparse
 
-from app import db
+from app import db, api
 from app.models import Bucketlist, Item, User
 
 # create instance of HTTPTokenAuth
@@ -100,6 +101,7 @@ class BucketlistResources(Resource):
         parser.add_argument(
             'q', type=str, help='Query must be a string',
             required=False, location='args')
+        parser.add_argument("page", type=int, required=False, location='args')
         args = parser.parse_args()
         if id:
             bucketlist = Bucketlist.query.filter_by(id=id).first()
@@ -125,22 +127,14 @@ class BucketlistResources(Resource):
             else:
                 return {"error": "No such bucketlist not exists."}, 404
         else:
-
-            if args['limit']:
-                all_buckets = Bucketlist.query.filter_by(
-                    created_by=int(str(g.user.id))).limit(
-                    args['limit'] if args['limit'] is not None else 50).all()
-
-                if not all_buckets:
-                    message = {
-                        "Message": "You have no bucketlists added."
-                    }
-                    return message, 404
-
-                # show bucketlists
-                bucket_lists = []
-                for bucketlist in all_buckets:
-                    bucket_lists.append({
+            bucketlists = Bucketlist.query.filter_by(created_by=g.user.id).paginate(page=args["page"],
+                                                                                    per_page=args["limit"])
+            lst = []
+            next_url = None
+            prev_url = None
+            if bucketlists:
+                for bucketlist in bucketlists.items:
+                    lst.append({
                         "id": bucketlist.id,
                         "name": bucketlist.name,
                         "created_at": str(bucketlist.created_at),
@@ -151,56 +145,26 @@ class BucketlistResources(Resource):
                             "name": item.name,
                             "done": item.done
                         }
-                            for item in bucketlist.items]
+                            for item in bucketlist.items],
                     })
-
-                return bucket_lists, 200
-            elif args["q"]:
-                bucketlists = Bucketlist.query.filter(
-                    Bucketlist.name.like('%{}%'.format(args['q']))).filter_by(
-                    created_by=int(str(g.user.id))).all()
-
-                if bucketlists:
-                    results = []
-                    for bucketlist in bucketlists:
-                        results.append({
-                            "id": bucketlist.id,
-                            "name": bucketlist.name,
-                            "created_at": str(bucketlist.created_at),
-                            "modified_at": str(bucketlist.modified_at),
-                            "created_by": bucketlist.created_by,
-                            "items": [{
-                                "id": item.id,
-                                "name": item.name,
-                                "done": item.done
-                            }
-                                for item in bucketlist.items]
-                        })
-
-                    return results, 200
-                else:
-                    return {"error": "There is no bucketlist containing that name."}, 404
+                if bucketlists.has_next:
+                    next_url = urljoin("http://127.0.0.1:5000/api/v1/bucketlists", api.url_for(BucketlistResources,
+                                                                                               page=bucketlists.next_num,
+                                                                                               limit=bucketlists.per_page))
+                if bucketlists.has_prev:
+                    prev_url = urljoin("http://127.0.0.1:5000/api/v1/bucketlists", api.url_for(BucketlistResources,
+                                                                                               page=bucketlists.prev_num,
+                                                                                               limit=bucketlists.per_page))
+                page_details = {
+                    "current_page": bucketlists.page,
+                    "limit": 2,
+                    "next_page": next_url,
+                    "prev_page": prev_url,
+                    "bucketlists": lst
+                }
+                return page_details, 200
             else:
-                bucketlists = Bucketlist.query.filter_by(created_by=g.user.id)
-                lst = []
-                if bucketlists:
-                    for bucketlist in bucketlists:
-                        lst.append({
-                            "id": bucketlist.id,
-                            "name": bucketlist.name,
-                            "created_at": str(bucketlist.created_at),
-                            "modified_at": str(bucketlist.modified_at),
-                            "created_by": bucketlist.created_by,
-                            "items": [{
-                                "id": item.id,
-                                "name": item.name,
-                                "done": item.done
-                            }
-                                for item in bucketlist.items]
-                        })
-                    return lst, 200
-                else:
-                    return {"error": "You have no bucketlists"}, 404
+                return {"error": "You have no bucketlists"}, 404
 
     @auth.login_required
     def post(self):
