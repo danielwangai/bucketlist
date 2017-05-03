@@ -7,6 +7,7 @@ from flask_restful import Resource, reqparse
 
 from app import db, api
 from app.models import Bucketlist, Item, User
+from config import configurations
 
 # create instance of HTTPTokenAuth
 auth = HTTPTokenAuth(scheme="Token")
@@ -129,7 +130,8 @@ class BucketlistResources(Resource):
                 return {"error": "Bucketlist not found."}, 404
         else:
             bucketlists = Bucketlist.query.filter_by(created_by=g.user.id).paginate(page=args["page"],
-                                                                                    per_page=args["limit"])
+                                                                                    per_page=args["limit"],
+                                                                                    error_out=False)
             my_buckets = []
             next_url = None
             prev_url = None
@@ -149,11 +151,11 @@ class BucketlistResources(Resource):
                             for item in bucketlist.items],
                     })
                 if bucketlists.has_next:
-                    next_url = urljoin("http://127.0.0.1:5000/api/v1/bucketlists", api.url_for(BucketlistResources,
+                    next_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
                                                                                                page=bucketlists.next_num,
                                                                                                limit=bucketlists.per_page))
                 if bucketlists.has_prev:
-                    prev_url = urljoin("http://127.0.0.1:5000/api/v1/bucketlists", api.url_for(BucketlistResources,
+                    prev_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
                                                                                                page=bucketlists.prev_num,
                                                                                                limit=bucketlists.per_page))
                 page_details = {
