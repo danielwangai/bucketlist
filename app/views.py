@@ -166,14 +166,17 @@ class BucketlistResources(Resource):
                                 BucketlistResources,
                                 page=bucketlists.prev_num,
                                 limit=bucketlists.per_page)))
-                    page_details = {
-                        "current_page": bucketlists.page,
-                        "limit": 2,
-                        "next_page": next_url,
-                        "prev_page": prev_url,
-                        "bucketlists": my_buckets
-                    }
-                    return page_details, 200
+                    if my_buckets:
+                        page_details = {
+                            "current_page": bucketlists.page,
+                            "limit": 2,
+                            "next_page": next_url,
+                            "prev_page": prev_url,
+                            "bucketlists": my_buckets
+                        }
+                        return page_details, 200
+                    else:
+                        return {"error": "You have no bucketlists"}, 404
                 else:
                     return {"error": "You have no bucketlists"}, 404
 
@@ -204,7 +207,7 @@ class BucketlistResources(Resource):
                     return results, 200
                 else:
                     return ({"error":
-                             "There is no bucketlist containing that name."},
+                             "You have no bucketlist containing that name."},
                             404)
             else:
                 # get bucketlists for all users
@@ -225,7 +228,10 @@ class BucketlistResources(Resource):
                             }
                                 for item in bucketlist.items],
                         })
-                return my_buckets, 200
+                if my_buckets:
+                    return my_buckets, 200
+                else:
+                    return {"error": "You have no bucketlists"}, 404
 
     @auth.login_required
     def post(self):
