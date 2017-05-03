@@ -1,7 +1,6 @@
 """To test bucketlist item endpoints."""
 import json
 
-from app.models import Bucketlist, Item, User
 from tests import BaseTestCase
 
 

@@ -1,13 +1,6 @@
 """The entry point of the application."""
 
-from flask import Flask
-from flask_migrate import Migrate, MigrateCommand
-from flask_restful import Api
-from flask_script import Manager
-
-from config import configurations
-from app import db, create_app, api
-from app.models import User, Bucketlist, Item
+from app import create_app, api
 from app.views import (UserLogin, CreateUser, BucketlistResources,
                        BucketlistItemResources)
 

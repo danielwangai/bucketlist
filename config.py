@@ -1,3 +1,4 @@
+"""To define configurations for different development environments."""
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))

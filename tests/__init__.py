@@ -4,7 +4,6 @@ import unittest
 from app import create_app, api, db
 from app.views import (UserLogin, CreateUser, BucketlistResources,
                        BucketlistItemResources)
-from app.models import Bucketlist, Item, User
 
 
 class BaseTestCase(unittest.TestCase):

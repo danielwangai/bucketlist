@@ -1,8 +1,7 @@
 """Define api endpoints and logic."""
-import json
 from urllib.parse import urljoin
 
-from flask import g, Response
+from flask import g
 from flask_httpauth import HTTPTokenAuth
 from flask_restful import Resource, reqparse
 

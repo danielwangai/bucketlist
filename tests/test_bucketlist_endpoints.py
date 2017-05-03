@@ -1,5 +1,5 @@
+"""Tests for bucketlist endpoints."""
 import json
-from app.models import Bucketlist, Item, User
 
 from tests import BaseTestCase
 
@@ -20,8 +20,7 @@ class APIEndpointsTestCase(BaseTestCase):
         self.assertEqual(response.status_code, 201)
         # fetch bucketlists
         response = self.client.get("/api/v1/bucketlists",
-                                   headers=self.headers
-                                   )
+                                   headers=self.headers)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(len(json.loads(response.data)) > 0)
 

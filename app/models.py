@@ -1,8 +1,7 @@
+"""To define db models and their properties."""
 import os
 from datetime import datetime
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from itsdangerous import (TimedJSONWebSignatureSerializer
                           as Serializer, BadSignature, SignatureExpired)
 
@@ -11,6 +10,7 @@ from app import db
 
 class User(db.Model):
     """To define user properties."""
+
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), index=True)
@@ -42,6 +42,7 @@ class User(db.Model):
 
 class Bucketlist(db.Model):
     """To define bucketlist properties."""
+
     __tablename__ = 'bucketlists'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
@@ -68,6 +69,7 @@ class Bucketlist(db.Model):
 
 class Item(db.Model):
     """To define item properties."""
+
     __tablename__ = 'items'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200))
