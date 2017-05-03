@@ -1,3 +1,4 @@
+"""Define api endpoints and logic."""
 import json
 from urllib.parse import urljoin
 
@@ -86,6 +87,7 @@ class BucketlistResources(Resource):
     """To perform CRUD on Bucetlists."""
 
     def __init__(self):
+        """To define bucket params."""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str,
                                    help='Wrong key', required=True)
@@ -129,9 +131,10 @@ class BucketlistResources(Resource):
                 return {"error": "Bucketlist not found."}, 404
         else:
             if args["page"] or args["limit"]:
-                bucketlists = Bucketlist.query.filter_by(created_by=g.user.id).paginate(page=args["page"],
-                                                                                        per_page=args["limit"],
-                                                                                        error_out=False)
+                bucketlists = (Bucketlist.query.filter_by(
+                    created_by=g.user.id).paginate(page=args["page"],
+                                                   per_page=args["limit"],
+                                                   error_out=False))
                 my_buckets = []
                 next_url = None
                 prev_url = None
@@ -151,13 +154,19 @@ class BucketlistResources(Resource):
                                 for item in bucketlist.items],
                         })
                     if bucketlists.has_next:
-                        next_url = urljoin(configurations["development"].BASEURL + "/bucketlists", api.url_for(BucketlistResources,
-                                                                                                               page=bucketlists.next_num,
-                                                                                                               limit=bucketlists.per_page))
+                        next_url = (urljoin(
+                            configurations["development"].BASEURL +
+                            "/bucketlists", api.url_for(
+                                BucketlistResources,
+                                page=bucketlists.next_num,
+                                limit=bucketlists.per_page)))
                     if bucketlists.has_prev:
-                        prev_url = urljoin(configurations["development"].BASEURL + "/bucketlists", api.url_for(BucketlistResources,
-                                                                                                               page=bucketlists.prev_num,
-                                                                                                               limit=bucketlists.per_page))
+                        prev_url = (urljoin(
+                            configurations["development"].BASEURL +
+                            "/bucketlists", api.url_for(
+                                BucketlistResources,
+                                page=bucketlists.prev_num,
+                                limit=bucketlists.per_page)))
                     page_details = {
                         "current_page": bucketlists.page,
                         "limit": 2,
@@ -170,9 +179,11 @@ class BucketlistResources(Resource):
                     return {"error": "You have no bucketlists"}, 404
 
             elif args["q"]:
-                bucketlists = Bucketlist.query.filter(
-                    Bucketlist.name.like('%{}%'.format(args['q']))).filter_by(
-                    created_by=int(str(g.user.id))).all()
+                # serches
+                bucketlists = (Bucketlist.query.filter(
+                    Bucketlist.name.like('%{}%'.format(
+                        args['q'].lower()))).filter_by(
+                    created_by=int(str(g.user.id))).all())
 
                 if bucketlists:
                     results = []
@@ -197,6 +208,7 @@ class BucketlistResources(Resource):
                              "There is no bucketlist containing that name."},
                             404)
             else:
+                # get bucketlists for all users
                 bucketlists = Bucketlist.query.filter_by(created_by=g.user.id)
                 my_buckets = []
                 if bucketlists:
@@ -231,11 +243,12 @@ class BucketlistResources(Resource):
             if data.get(value).isspace() or not data.get(value):
                 return {'error': 'Invalid parameter.'}, 400
 
-        if Bucketlist.query.filter_by(name=data["name"],
+        if Bucketlist.query.filter_by(name=data["name"].lower(),
                                       created_by=g.user.id).first():
             return {'error': 'The bucketlist already exists'}, 409
 
-        bucketlist = Bucketlist(name=data["name"], created_by=g.user.id)
+        bucketlist = Bucketlist(name=data["name"].lower(),
+                                created_by=g.user.id)
         db.session.add(bucketlist)
         db.session.commit()
         return {"msg": "Bucketlist created successfully.",
@@ -252,7 +265,8 @@ class BucketlistResources(Resource):
 
         if args["name"]:
             if bucket.created_by == g.user.id:
-                if Bucketlist.query.filter_by(name=args["name"]).first():
+                if Bucketlist.query.filter_by(
+                        name=args["name"].lower()).first():
                     # check if bucket with same name exists
                     return ({"error": "Cannot update bucket with same name."},
                             409)
@@ -286,9 +300,9 @@ class BucketlistResources(Resource):
 
 class BucketlistItemResources(Resource):
     """To perform CRUD on Bucetlist Items."""
-    decorators = []
 
     def __init__(self):
+        """To define bucketlist item params."""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('name', type=str,
                                    help='The key name required.')
