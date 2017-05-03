@@ -129,46 +129,72 @@ class BucketlistResources(Resource):
             else:
                 return {"error": "Bucketlist not found."}, 404
         else:
-            bucketlists = Bucketlist.query.filter_by(created_by=g.user.id).paginate(page=args["page"],
-                                                                                    per_page=args["limit"],
-                                                                                    error_out=False)
-            my_buckets = []
-            next_url = None
-            prev_url = None
-            if bucketlists:
-                for bucketlist in bucketlists.items:
-                    my_buckets.append({
-                        "id": bucketlist.id,
-                        "name": bucketlist.name,
-                        "created_at": str(bucketlist.created_at),
-                        "modified_at": str(bucketlist.modified_at),
-                        "created_by": bucketlist.created_by,
-                        "items": [{
-                            "id": item.id,
-                            "name": item.name,
-                            "done": item.done
-                        }
-                            for item in bucketlist.items],
-                    })
-                if bucketlists.has_next:
-                    next_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
-                                                                                               page=bucketlists.next_num,
-                                                                                               limit=bucketlists.per_page))
-                if bucketlists.has_prev:
-                    prev_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
-                                                                                               page=bucketlists.prev_num,
-                                                                                               limit=bucketlists.per_page))
-                page_details = {
-                    "current_page": bucketlists.page,
-                    "limit": 2,
-                    "next_page": next_url,
-                    "prev_page": prev_url,
-                    "bucketlists": my_buckets
-                }
-                return page_details, 200
-            else:
-                return {"error": "You have no bucketlists"}, 404
+            if args["page"] or args["limit"]:
+                bucketlists = Bucketlist.query.filter_by(created_by=g.user.id).paginate(page=args["page"],
+                                                                                        per_page=args["limit"],
+                                                                                        error_out=False)
+                my_buckets = []
+                next_url = None
+                prev_url = None
+                if bucketlists:
+                    for bucketlist in bucketlists.items:
+                        my_buckets.append({
+                            "id": bucketlist.id,
+                            "name": bucketlist.name,
+                            "created_at": str(bucketlist.created_at),
+                            "modified_at": str(bucketlist.modified_at),
+                            "created_by": bucketlist.created_by,
+                            "items": [{
+                                "id": item.id,
+                                "name": item.name,
+                                "done": item.done
+                            }
+                                for item in bucketlist.items],
+                        })
+                    if bucketlists.has_next:
+                        next_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
+                                                                                                   page=bucketlists.next_num,
+                                                                                                   limit=bucketlists.per_page))
+                    if bucketlists.has_prev:
+                        prev_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
+                                                                                                   page=bucketlists.prev_num,
+                                                                                                   limit=bucketlists.per_page))
+                    page_details = {
+                        "current_page": bucketlists.page,
+                        "limit": 2,
+                        "next_page": next_url,
+                        "prev_page": prev_url,
+                        "bucketlists": my_buckets
+                    }
+                    return page_details, 200
+                else:
+                    return {"error": "You have no bucketlists"}, 404
 
+            elif args["q"]:
+                bucketlists = Bucketlist.query.filter(
+                    Bucketlist.name.like('%{}%'.format(args['q']))).filter_by(
+                    created_by=int(str(g.user.id))).all()
+
+                if bucketlists:
+                    results = []
+                    for bucketlist in bucketlists:
+                        results.append({
+                            "id": bucketlist.id,
+                            "name": bucketlist.name,
+                            "created_at": str(bucketlist.created_at),
+                            "modified_at": str(bucketlist.modified_at),
+                            "created_by": bucketlist.created_by,
+                            "items": [{
+                                "id": item.id,
+                                "name": item.name,
+                                "done": item.done
+                            }
+                                for item in bucketlist.items]
+                        })
+
+                    return results, 200
+                else:
+                    return {"error": "There is no bucketlist containing that name."}, 404
     @auth.login_required
     def post(self):
         """To create a new bucketlist."""
