@@ -181,7 +181,7 @@ class BucketlistResources(Resource):
         values = ["name"]
 
         for value in values:
-            if data.get(value).isspace() or not data.get(value):
+            if data.get(value):
                 return {'error': 'Invalid parameter.'}, 400
 
         if Bucketlist.query.filter_by(name=data["name"],
