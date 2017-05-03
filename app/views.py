@@ -181,7 +181,7 @@ class BucketlistResources(Resource):
         values = ["name"]
 
         for value in values:
-            if data.get(value):
+            if data.get(value).isspace() or not data.get(value):
                 return {'error': 'Invalid parameter.'}, 400
 
         if Bucketlist.query.filter_by(name=data["name"],
@@ -247,9 +247,6 @@ class BucketlistItemResources(Resource):
                                    help='The key name required.')
         self.reqparse.add_argument('status', type=str,
                                    help='status of the item')
-        # self.reqparse.add_argument('description', type=str,
-        #                            help='Description required',
-        #                            required=True)
 
     @auth.login_required
     def get(self, bucketlist_id, item_id=None):
