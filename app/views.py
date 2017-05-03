@@ -166,13 +166,16 @@ class BucketlistResources(Resource):
                         "prev_page": prev_url,
                         "bucketlists": my_buckets
                     }
-                    return page_details, 200
+                    if my_buckets:
+                        return page_details, 200
+                    else:
+                        return {"error": "You have no bucketlists"}, 404
                 else:
                     return {"error": "You have no bucketlists"}, 404
 
             elif args["q"]:
                 bucketlists = Bucketlist.query.filter(
-                    Bucketlist.name.like('%{}%'.format(args['q']))).filter_by(
+                    Bucketlist.name.like('%{}%'.format(args['q'].lower()))).filter_by(
                     created_by=int(str(g.user.id))).all()
 
                 if bucketlists:
@@ -210,11 +213,11 @@ class BucketlistResources(Resource):
             if data.get(value).isspace() or not data.get(value):
                 return {'error': 'Invalid parameter.'}, 400
 
-        if Bucketlist.query.filter_by(name=data["name"],
+        if Bucketlist.query.filter_by(name=data["name"].lower(),
                                       created_by=g.user.id).first():
             return {'error': 'The bucketlist already exists'}, 409
 
-        bucketlist = Bucketlist(name=data["name"], created_by=g.user.id)
+        bucketlist = Bucketlist(name=data["name"].lower(), created_by=g.user.id)
         db.session.add(bucketlist)
         db.session.commit()
         return {"msg": "Bucketlist created successfully.",
