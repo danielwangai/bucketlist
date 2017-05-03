@@ -1,5 +1,6 @@
 import json
 from urllib.parse import urljoin
+
 from flask import g, Response
 from flask_httpauth import HTTPTokenAuth
 from flask_restful import Resource, reqparse
@@ -122,19 +123,19 @@ class BucketlistResources(Resource):
                             }, 200
                 else:
                     return (
-                        {"error": "Cannot fetch bucketlist you don't own."},
-                        403)
+                        {"error": "Bucketlist not found."},
+                        404)
             else:
-                return {"error": "No such bucketlist not exists."}, 404
+                return {"error": "Bucketlist not found."}, 404
         else:
             bucketlists = Bucketlist.query.filter_by(created_by=g.user.id).paginate(page=args["page"],
                                                                                     per_page=args["limit"])
-            lst = []
+            my_buckets = []
             next_url = None
             prev_url = None
             if bucketlists:
                 for bucketlist in bucketlists.items:
-                    lst.append({
+                    my_buckets.append({
                         "id": bucketlist.id,
                         "name": bucketlist.name,
                         "created_at": str(bucketlist.created_at),
@@ -160,7 +161,7 @@ class BucketlistResources(Resource):
                     "limit": 2,
                     "next_page": next_url,
                     "prev_page": prev_url,
-                    "bucketlists": lst
+                    "bucketlists": my_buckets
                 }
                 return page_details, 200
             else:
