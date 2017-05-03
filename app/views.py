@@ -91,7 +91,6 @@ class BucketlistResources(Resource):
                                    help='Wrong key', required=True)
         self.reqparse.add_argument('description', type=str, help='Wrong key')
 
-
     @auth.login_required
     def get(self, id=None):
         """To return bucketlist(s)."""
@@ -152,13 +151,13 @@ class BucketlistResources(Resource):
                                 for item in bucketlist.items],
                         })
                     if bucketlists.has_next:
-                        next_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
-                                                                                                   page=bucketlists.next_num,
-                                                                                                   limit=bucketlists.per_page))
+                        next_url = urljoin(configurations["development"].BASEURL + "/bucketlists", api.url_for(BucketlistResources,
+                                                                                                               page=bucketlists.next_num,
+                                                                                                               limit=bucketlists.per_page))
                     if bucketlists.has_prev:
-                        prev_url = urljoin(configurations["development"].BASEURL+"/bucketlists", api.url_for(BucketlistResources,
-                                                                                                   page=bucketlists.prev_num,
-                                                                                                   limit=bucketlists.per_page))
+                        prev_url = urljoin(configurations["development"].BASEURL + "/bucketlists", api.url_for(BucketlistResources,
+                                                                                                               page=bucketlists.prev_num,
+                                                                                                               limit=bucketlists.per_page))
                     page_details = {
                         "current_page": bucketlists.page,
                         "limit": 2,
@@ -194,7 +193,29 @@ class BucketlistResources(Resource):
 
                     return results, 200
                 else:
-                    return {"error": "There is no bucketlist containing that name."}, 404
+                    return ({"error":
+                             "There is no bucketlist containing that name."},
+                            404)
+            else:
+                bucketlists = Bucketlist.query.filter_by(created_by=g.user.id)
+                my_buckets = []
+                if bucketlists:
+                    for bucketlist in bucketlists:
+                        my_buckets.append({
+                            "id": bucketlist.id,
+                            "name": bucketlist.name,
+                            "created_at": str(bucketlist.created_at),
+                            "modified_at": str(bucketlist.modified_at),
+                            "created_by": bucketlist.created_by,
+                            "items": [{
+                                "id": item.id,
+                                "name": item.name,
+                                "done": item.done
+                            }
+                                for item in bucketlist.items],
+                        })
+                return my_buckets, 200
+
     @auth.login_required
     def post(self):
         """To create a new bucketlist."""
