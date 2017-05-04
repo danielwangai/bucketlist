@@ -23,6 +23,11 @@ class DevelopmentConfig(Config):
     """
     DEBUG = True
     BASEURL = "http://127.0.0.1:5000/api/v1"
+    SQLALCHEMY_DATABASE_URI = 'postgresql://{}:{}@localhost/bucketlist'.format(
+        os.environ["DB_USERNAME"], os.environ["DB_PASSWORD"]
+    )
+    # SQLALCHEMY_DATABASE_URI = ('sqlite:///' + os.path.join(basedir,
+    #                                                        'bucketlist_dev.db'))
 
 
 class TestingConfig(Config):
