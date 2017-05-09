@@ -1,7 +1,8 @@
 """Define api endpoints and logic."""
 from urllib.parse import urljoin
+import json
 
-from flask import g
+from flask import g, request, jsonify
 from flask_httpauth import HTTPTokenAuth
 from flask_restful import Resource, reqparse
 
@@ -21,6 +22,15 @@ def verify_token(token):
         return False
     g.user = user
     return True
+
+def verify():
+    if not request.json:
+        token = json.loads(request.data).get('Authorization')
+        print(token)
+    else:
+        token = request.json.get('Authorization')
+    g.current_user = User.verify_auth_token(token)
+    return jsonify(g.current_user is not None)
 
 
 class UserLogin(Resource):
